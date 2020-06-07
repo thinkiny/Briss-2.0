@@ -4,58 +4,19 @@
  * <p>
  * This file is part of BRISS.
  * <p>
- * BRISS is free software: you can redistribute it and/or modify it under the
- * terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
+ * BRISS is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * <p>
- * BRISS is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * BRISS is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  * <p>
- * You should have received a copy of the GNU General Public License along with
- * BRISS. If not, see http://www.gnu.org/licenses/.
+ * You should have received a copy of the GNU General Public License along with BRISS. If not, see
+ * http://www.gnu.org/licenses/.
  */
 package at.laborg.briss;
 
-import at.laborg.briss.exception.CropException;
-import at.laborg.briss.gui.HelpDialog;
-import at.laborg.briss.gui.MergedPanel;
-import at.laborg.briss.gui.WrapLayout;
-import at.laborg.briss.model.ClusterDefinition;
-import at.laborg.briss.model.CropDefinition;
-import at.laborg.briss.model.PageCluster;
-import at.laborg.briss.model.PageExcludes;
-import at.laborg.briss.model.WorkingSet;
-import at.laborg.briss.utils.BrissFileHandling;
-import at.laborg.briss.utils.ClusterCreator;
-import at.laborg.briss.utils.ClusterRenderWorker;
-import at.laborg.briss.utils.DesktopHelper;
-import at.laborg.briss.utils.DocumentCropper;
-import at.laborg.briss.utils.FileDrop;
-import at.laborg.briss.utils.PageNumberParser;
-import com.itextpdf.text.DocumentException;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.stage.FileChooser;
-import org.jpedal.exception.PdfException;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -76,9 +37,52 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.IntStream;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import com.itextpdf.text.DocumentException;
+import org.jpedal.exception.PdfException;
+import at.laborg.briss.exception.CropException;
+import at.laborg.briss.gui.HelpDialog;
+import at.laborg.briss.gui.MergedPanel;
+import at.laborg.briss.gui.WrapLayout;
+import at.laborg.briss.model.ClusterDefinition;
+import at.laborg.briss.model.CropDefinition;
+import at.laborg.briss.model.PageCluster;
+import at.laborg.briss.model.PageExcludes;
+import at.laborg.briss.model.WorkingSet;
+import at.laborg.briss.utils.BrissFileHandling;
+import at.laborg.briss.utils.ClusterCreator;
+import at.laborg.briss.utils.ClusterRenderWorker;
+import at.laborg.briss.utils.DesktopHelper;
+import at.laborg.briss.utils.DocumentCropper;
+import at.laborg.briss.utils.FileDrop;
+import at.laborg.briss.utils.PageNumberParser;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.stage.FileChooser;
 
 /**
  * @author gerhard, hybridtupel
@@ -92,7 +96,8 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
     private static final int MIN_HEIGHT = 400;
     private static final int MIN_WIDTH = 400;
 
-    private static final String DONATION_URI = "http://sourceforge.net/project/project_donations.php?group_id=320676"; //$NON-NLS-1$
+    private static final String DONATION_URI =
+            "http://sourceforge.net/project/project_donations.php?group_id=320676"; //$NON-NLS-1$
     private static final String RES_ICON_PATH = "Briss_icon_032x032.gif"; //$NON-NLS-1$
     private static final String RES_DROP_IMG_PATH = "drop.png"; //$NON-NLS-1$
     private static final String PROGRESS = "progress";
@@ -127,7 +132,8 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
 
     private void initFileChooser() {
         fileChooser.setInitialDirectory(lastOpenDir);
-        FileChooser.ExtensionFilter pdfFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
+        FileChooser.ExtensionFilter pdfFilter =
+                new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
         fileChooser.getExtensionFilters().add(pdfFilter);
     }
 
@@ -140,10 +146,10 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
                 importNewPdfFile(fileArg);
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, e.getMessage(),
-                    Messages.getString("BrissGUI.brissError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                        Messages.getString("BrissGUI.brissError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             } catch (PdfException e) {
                 JOptionPane.showMessageDialog(this, e.getMessage(),
-                    Messages.getString("BrissGUI.brissError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                        Messages.getString("BrissGUI.brissError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             }
         }
 
@@ -195,7 +201,8 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
         helpMenu.add(openDonationLinkButton);
 
         showHelpButton = new JMenuItem(Messages.getString("BrissGUI.showHelp")); //$NON-NLS-1$
-        showHelpButton.addActionListener(a -> new HelpDialog(this, Messages.getString("BrissGUI.brissHelp"), Dialog.ModalityType.MODELESS));
+        showHelpButton.addActionListener(a -> new HelpDialog(this,
+                Messages.getString("BrissGUI.brissHelp"), Dialog.ModalityType.MODELESS));
         helpMenu.add(showHelpButton);
 
         setJMenuBar(menuBar);
@@ -220,7 +227,7 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
         showPreview.setVisible(false);
 
         scrollPane = new JScrollPane(previewPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVisible(true);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
@@ -259,7 +266,8 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
     }
 
     private void setWindowBounds() {
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        GraphicsDevice gd =
+                GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         int screenWidth = gd.getDisplayMode().getWidth();
         int screenHeight = gd.getDisplayMode().getHeight();
         setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
@@ -292,18 +300,20 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
 
         // repeat show_dialog until valid input or canceled
         while (!inputIsValid) {
-            String input = JOptionPane.showInputDialog(Messages.getString("BrissGUI.excludedPagesInfo"), previousInput);
+            String input = JOptionPane.showInputDialog(
+                    Messages.getString("BrissGUI.excludedPagesInfo"), previousInput);
             previousInput = input;
 
             if (input == null || input.equals("")) //$NON-NLS-1$
                 return null;
 
             try {
-                PageExcludes pageExcludes = new PageExcludes(PageNumberParser.parsePageNumber(input));
+                PageExcludes pageExcludes =
+                        new PageExcludes(PageNumberParser.parsePageNumber(input));
                 return pageExcludes;
             } catch (ParseException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage(),
-                    Messages.getString("BrissGUI.inputError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                        Messages.getString("BrissGUI.inputError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             }
 
         }
@@ -315,7 +325,8 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
             // Open JavaFX file chooser in FX-thread which is not as ugly as the swing one
             initFileChooser();
             fileChooser.setTitle("Save cropped PDF File");
-            fileChooser.setInitialFileName(BrissFileHandling.getRecommendedFileName(workingSet.getSourceFile()));
+            fileChooser.setInitialFileName(
+                    BrissFileHandling.getRecommendedFileName(workingSet.getSourceFile()));
             File file = fileChooser.showSaveDialog(null);
             if (file != null) {
                 SwingUtilities.invokeLater(() -> savePDF(file));
@@ -340,29 +351,59 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
             importNewPdfFile(file);
             setTitle("BRISS - " + file.getName()); //$NON-NLS-1$
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("BrissGUI."), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+            JOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("BrissGUI."), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE);
         } catch (PdfException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(),
-                Messages.getString("BrissGUI.loadingError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                    Messages.getString("BrissGUI.loadingError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
         }
     }
 
     private void savePDF(File file) {
         setWorkingState(Messages.getString("BrissGUI.loadingPDF")); //$NON-NLS-1$
         try {
-            CropDefinition cropDefinition = CropDefinition.createCropDefinition(workingSet.getSourceFile(),
-                file, workingSet.getClusterDefinition());
+            CropDefinition cropDefinition = CropDefinition.createCropDefinition(
+                    workingSet.getSourceFile(), file, workingSet.getClusterDefinition());
             File result = DocumentCropper.crop(cropDefinition);
             if (result != null) {
+                executePdfScale(file.getAbsolutePath());
                 DesktopHelper.openFileWithDesktopApp(result);
                 lastOpenDir = result.getParentFile();
             }
 
         } catch (IOException | DocumentException | CropException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(),
-                Messages.getString("BrissGUI.croppingError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                    Messages.getString("BrissGUI.croppingError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
         } finally {
-            setIdleState(); //$NON-NLS-1$
+            setIdleState(); // $NON-NLS-1$
+        }
+    }
+
+    private void executePdfScale(String croppedPath) {
+        Path scriptPath = null;
+        String scalePath = croppedPath.substring(0, croppedPath.length() - 4) + ".A5.pdf";
+        try {
+            scriptPath = Files.createTempFile("pdf-scale", ".sh");
+            Files.copy(getClass().getResourceAsStream("/pdfScale.sh"), scriptPath,
+                    StandardCopyOption.REPLACE_EXISTING);
+            String[] cmdv = new String[] {"/bin/bash", scriptPath.toAbsolutePath().toString(), "-c",
+                    "A5", "-r", "A5", croppedPath};
+            Process p = Runtime.getRuntime().exec(cmdv);
+            if (p.waitFor() == 0) {
+                Files.move(Paths.get(scalePath), Paths.get(croppedPath),
+                        StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                p.getErrorStream().transferTo(System.out);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (scriptPath != null) {
+                try {
+                    Files.delete(scriptPath);
+                } catch (Exception e) {
+                }
+            }
         }
     }
 
@@ -373,16 +414,18 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
             DesktopHelper.openFileWithDesktopApp(result);
         } catch (IOException | DocumentException | CropException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(),
-                Messages.getString("BrissGUI.croppingError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                    Messages.getString("BrissGUI.croppingError"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
         } finally {
-            setIdleState(); //$NON-NLS-1$
+            setIdleState(); // $NON-NLS-1$
         }
     }
 
-    private File createAndExecuteCropJobForPreview() throws IOException, DocumentException, CropException {
+    private File createAndExecuteCropJobForPreview()
+            throws IOException, DocumentException, CropException {
         File tmpCropFileDestination = File.createTempFile("briss", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-        CropDefinition cropDefinition = CropDefinition.createCropDefinition(workingSet.getSourceFile(),
-            tmpCropFileDestination, workingSet.getClusterDefinition());
+        CropDefinition cropDefinition =
+                CropDefinition.createCropDefinition(workingSet.getSourceFile(),
+                        tmpCropFileDestination, workingSet.getClusterDefinition());
         File result = DocumentCropper.crop(cropDefinition);
         return result;
     }
@@ -406,7 +449,9 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
         cardLayout.first(wrapperPanel);
         progressBar.setVisible(true);
         progressBar.setString(Messages.getString("BrissGUI.loadingNewFile")); //$NON-NLS-1$
-        ClusterPagesTask clusterTask = new ClusterPagesTask(loadFile, null);
+        HashSet<Integer> pages = new HashSet<Integer>();
+        IntStream.range(0, 6).forEach(pages::add);
+        ClusterPagesTask clusterTask = new ClusterPagesTask(loadFile, new PageExcludes(pages));
         clusterTask.addPropertyChangeListener(this);
         clusterTask.execute();
     }
@@ -414,7 +459,8 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
     private void reloadWithOtherExcludes() throws IOException, PdfException {
         previewPanel.removeAll();
         progressBar.setString(Messages.getString("BrissGUI.reloadingFile")); //$NON-NLS-1$
-        ClusterPagesTask clusterTask = new ClusterPagesTask(workingSet.getSourceFile(), getExcludedPages());
+        ClusterPagesTask clusterTask =
+                new ClusterPagesTask(workingSet.getSourceFile(), getExcludedPages());
         clusterTask.addPropertyChangeListener(this);
         clusterTask.execute();
     }
@@ -575,7 +621,8 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
 
         // get user input
         // minimums are used as a default
-        String input = JOptionPane.showInputDialog(Messages.getString("BrissGUI.position"), defInput);
+        String input =
+                JOptionPane.showInputDialog(Messages.getString("BrissGUI.position"), defInput);
 
         if (input == null || input.equals("")) //$NON-NLS-1$
             return;
@@ -611,13 +658,13 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (PROGRESS.equals(evt.getPropertyName())) { //$NON-NLS-1$
+        if (PROGRESS.equals(evt.getPropertyName())) { // $NON-NLS-1$
             progressBar.setValue((Integer) evt.getNewValue());
         }
     }
 
-    private void setStateAfterClusteringFinished(ClusterDefinition newClusters, PageExcludes newPageExcludes,
-                                                 File newSource) {
+    private void setStateAfterClusteringFinished(ClusterDefinition newClusters,
+            PageExcludes newPageExcludes, File newSource) {
         updateWorkingSet(newClusters, newPageExcludes, newSource);
 
         previewPanel.removeAll();
@@ -630,7 +677,7 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
         }
         progressBar.setString(Messages.getString("BrissGUI.clusteringRenderingFinished")); //$NON-NLS-1$
 
-        setIdleState(); //$NON-NLS-1$
+        setIdleState(); // $NON-NLS-1$
         pack();
         setExtendedState(Frame.MAXIMIZED_BOTH);
         previewPanel.repaint();
@@ -640,7 +687,8 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
         repaint();
     }
 
-    private void updateWorkingSet(ClusterDefinition newClusters, PageExcludes newPageExcludes, File newSource) {
+    private void updateWorkingSet(ClusterDefinition newClusters, PageExcludes newPageExcludes,
+            File newSource) {
         if (workingSet == null) {
             // completely new
             workingSet = new WorkingSet(newSource);
@@ -699,7 +747,8 @@ public class BrissGUI extends JFrame implements PropertyChangeListener, Componen
             renderWorker.start();
 
             while (renderWorker.isAlive()) {
-                int percent = (int) ((renderWorker.workerUnitCounter / (float) totalWorkUnits) * 100);
+                int percent =
+                        (int) ((renderWorker.workerUnitCounter / (float) totalWorkUnits) * 100);
                 setProgress(percent);
                 try {
                     Thread.sleep(50);
